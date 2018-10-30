@@ -39,8 +39,8 @@ plt.scatter(data_by_type[0][:,4], data_by_type[0][:,0], 20, c="g")
 plt.scatter(data_by_type[1][:,4], data_by_type[1][:,0], 20, c="r")
 
 #LMS Solving
-x = concatenate((data_by_type[0][:,4], data_by_type[1][:,4]), axis=0).flatten
-y = concatenate((data_by_type[0][:,0], data_by_type[1][:,0]), axis=0).flatten
+x = concatenate((data_by_type[0][:,4], data_by_type[1][:,4]), axis=0).flatten()
+y = concatenate((data_by_type[0][:,0], data_by_type[1][:,0]), axis=0).flatten()
 
 
 #def lms(x, y, eta=1e-5, maxiter=1000):
