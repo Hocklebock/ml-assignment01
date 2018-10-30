@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
-from random import randint
-from numpy import array, unique, mean, amax, amin, concatenate, ones, sum, dot
+from numpy import array, unique, mean, amax, amin, transpose, concatenate, ones, sum, dot
+from numpy.random import randint, uniform
 
 #open file and split header from data
 file = open('Fisher.txt', 'r')
@@ -37,47 +37,52 @@ plt.title('Fisher`s Iris Data')
 plt.grid(True)
 plt.scatter(data_by_type[0][:,4], data_by_type[0][:,0], 20, c="g")
 plt.scatter(data_by_type[1][:,4], data_by_type[1][:,0], 20, c="r")
-plt.savefig("test4d.png")
 
 #LMS Solving
-x = concatenate((data_by_type[0][:,4], data_by_type[1][:,4]), axis=0)
-y = concatenate((data_by_type[0][:,0], data_by_type[1][:,0]), axis=0)
-w = -1 * ones((2, 1))
-eta = 1e-4
+x = concatenate((data_by_type[0][:,4], data_by_type[1][:,4]), axis=0).flatten
+y = concatenate((data_by_type[0][:,0], data_by_type[1][:,0]), axis=0).flatten
+
+
+#def lms(x, y, eta=1e-5, maxiter=1000):
+w = uniform(-1, 1, 2)
+eta = 0.0005
 i = 0
 error = sum([(yi - dot([1, xi], w))**2 for xi, yi in zip(x, y)])
-diffold = 0
 
 w0 = []
 w1 = []
 err = []
 
-while error > 1e-5 and i < 1000:
-    index = randint(0, x.shape[0]-1)
-    xi = array([[1, x[index]]]).T  # x vector of current iteration of shape [1 \n xi]
-    diff = y[index] - dot(w.T, xi)  # difference between data value an linear regression value
-    dw = eta * diff * xi  # delta weights for convergence
-    w += dw
-    error = (diff - diffold) ** 2  # sum of squared errors for convergence check
-    diffold = diff
+while error > 1e-5 and i < 10000:
+    index = randint(0, len(x) - 1)
+
+    xi = [1, x[index]]
+    for j in range(len(xi)):
+        diff = y[index] - dot(w, xi)  # difference between data value an linear regression value
+        # diff = sum([(yi - dot([1, xi], w)) for xi, yi in zip(x, y)]) #batch gradient descent
+        w[j] += eta * diff * xi[j]  # delta weights for convergence
     i += 1
 
-    #convergence parameter study
+    error = sum([(yi - dot(w, [1, xi])) ** 2 for xi, yi in zip(x, y)])
+
+    # convergence parameter study
     w0.append(w[0].flatten())
     w1.append(w[1].flatten())
     err.append(error.flatten())
 
 
-print(i, error)
+print(i, error, w[0], w[1])
 
 plt.plot(x, w[0]+w[1]*x)
-plt.savefig("test4c.png")
+plt.savefig("test4d.png")
 
 f3 = plt.figure(3)
 plt.plot(range(i), err)
+plt.savefig("test4convergence1.png")
 f4 = plt.figure(4)
 plt.plot(range(i), w0)
 plt.plot(range(i), w1)
+plt.savefig("test4convergence2.png")
 
 plt.show()
 
